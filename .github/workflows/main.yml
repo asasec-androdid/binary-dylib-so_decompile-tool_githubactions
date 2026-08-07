@@ -33,7 +33,7 @@ jobs:
       run: |
         # Doğru parametre sırası: Proje Dizini, Proje Adı, -import, Hedef Dosya
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
-          -import ./target/binary \
+          -import ./superbear.dylib \
           -postScript ExportStrings.py /tmp/output_strings.txt
 
       
