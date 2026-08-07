@@ -35,7 +35,7 @@ jobs:
         mkdir -p /tmp/ghidra_out
         
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_project TempAnalysisProject \
-          -import ./target/superbear.dylib \
+          -import ./superbear.dylib \
           -analyze \
           -output /tmp/ghidra_out
       
