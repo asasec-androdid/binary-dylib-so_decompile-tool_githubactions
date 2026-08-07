@@ -1,0 +1,50 @@
+name: SuperBear Dylib Analysis
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # GitHub Actions sekmesinden manuel başlatmak için
+
+jobs:
+  analyze:
+    runs-on: macos-latest 
+
+    steps:
+    - name: Repo'yu Kopyala (Checkout)
+      uses: actions/checkout@v4
+
+    - name: Analiz Klasörü Oluştur
+      run: mkdir -p build/output
+
+    - name: Dosya Bilgilerini Kontrol Et
+      run: |
+        echo "=== DOSYA BİLGİSİ ==="
+        ls -lh superbear.dylib
+        file superbear.dylib
+
+    - name: Strings ve Sembolleri Çıkart
+      run: |
+        echo "=== STRINGS DÖKÜMÜ ===" > build/output/strings_result.txt
+        strings superbear.dylib >> build/output/strings_result.txt
+
+        echo "=== DIŞA AKTARILAN SEMBOLLER ===" > build/output/symbols_result.txt
+        nm -gU superbear.dylib >> build/output/symbols_result.txt
+
+    - name: Otool ile Bağımlılıkları ve Load Command'leri İncele
+      run: |
+        echo "=== DYLIB BAĞIMLILIKLARI ===" > build/output/otool_deps.txt
+        otool -L superbear.dylib >> build/output/otool_deps.txt
+
+        echo "=== OTOOL LOAD COMMANDS ===" > build/output/otool_loads.txt
+        otool -l superbear.dylib >> build/output/otool_loads.txt
+
+    - name: LLVM-Objdump ile Disassemble Et
+      run: |
+        echo "=== DISASSEMBLY (TEXT SEGMENT) ===" > build/output/disassemble.txt
+        llvm-objdump -d superbear.dylib >> build/output/disassemble.txt
+
+    - name: Sonuçları Artifact Olarak Kaydet
+      uses: actions/upload-artifact@v4
+      with:
+        name: superbear-analysis-results
+        path: build/output/
