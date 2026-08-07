@@ -3,13 +3,13 @@
 # Ghidra Moduler API Yonetici Betigi
 # Aktif etmek istedigin ozelligin onune True yaz. Kapatmak icin False yaz.
 
-dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir[span_1](start_span)[span_1](end_span)
-dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder[span_2](start_span)[span_2](end_span)
-dump_objc_classes = False     # Tum Objective-C sinif adlarini ve metotlarini kaydeder[span_3](start_span)[span_3](end_span)
-dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler[span_4](start_span)[span_4](end_span)
-dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder[span_5](start_span)[span_5](end_span)
-find_string_references = True # Stringlerin kod ici baglantilarini eslestirir[span_6](start_span)[span_6](end_span)
-dump_segments = True          # Segment ve section adres araliklarini listeler[span_7](start_span)[span_7](end_span)
+dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir
+dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder
+dump_objc_classes = False     # Tum Objective-C sinif adlarini ve metotlarini kaydeder
+dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler
+dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder
+find_string_references = True # Stringlerin kod ici baglantilarini eslestirir
+dump_segments = True          # Segment ve section adres araliklarini listeler
 
 ############################################################################################
 
