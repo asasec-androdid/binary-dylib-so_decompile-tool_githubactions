@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Ghidra Modüler API Yönetici Betiği
 # İstediğin özelliğin başındaki '#' işaretini kaldırarak aktif edebilirsin.
 
