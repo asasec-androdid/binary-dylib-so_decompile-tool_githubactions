@@ -3,18 +3,19 @@
 # Ghidra Moduler API Yonetici Betigi
 # Aktif etmek istedigin ozelligin onune True yaz. Kapatmak icin False yaz.
 
-dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir
-dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder
-dump_objc_classes = False     # Tum Objective-C sinif adlarini ve metotlarini kaydeder
-dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler
-dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder
-find_string_references = True # Stringlerin kod ici baglantilarini eslestirir
-dump_segments = True          # Segment ve section adres araliklarini listeler
+dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir[span_1](start_span)[span_1](end_span)
+dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder[span_2](start_span)[span_2](end_span)
+dump_objc_classes = False     # Tum Objective-C sinif adlarini ve metotlarini kaydeder[span_3](start_span)[span_3](end_span)
+dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler[span_4](start_span)[span_4](end_span)
+dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder[span_5](start_span)[span_5](end_span)
+find_string_references = True # Stringlerin kod ici baglantilarini eslestirir[span_6](start_span)[span_6](end_span)
+dump_segments = True          # Segment ve section adres araliklarini listeler[span_7](start_span)[span_7](end_span)
 
 ############################################################################################
 
 import sys
 import os
+import codecs
 from ghidra.program.model.listing import CodeUnit
 
 def main():
@@ -30,15 +31,18 @@ def main():
         listing = currentProgram.getListing()
         data_iter = listing.getData(True)
         count = 0
-        with open(out_dir + "/strings.txt", "w") as f:
+        with codecs.open(out_dir + "/strings.txt", "w", encoding="utf-8") as f:
             while data_iter.hasNext():
                 data = data_iter.next()
                 dt = data.getDataType()
                 if "string" in dt.getName().lower():
                     val = data.getValue()
                     if val:
-                        f.write(str(data.getMinAddress()) + ": " + str(val) + "\n")
-                        count += 1
+                        try:
+                            f.write(str(data.getMinAddress()) + ": " + unicode(val) + "\n")
+                            count += 1
+                        except:
+                            pass
         print("[+] " + str(count) + " string kaydedildi.")
 
     # 2. Fonksiyon Dokumu
@@ -46,7 +50,7 @@ def main():
         print("[+] 'dump_functions' aktif: Fonksiyonlar taranıyor...")
         funcs = currentProgram.getFunctionManager().getFunctions(True)
         count = 0
-        with open(out_dir + "/functions.txt", "w") as f:
+        with codecs.open(out_dir + "/functions.txt", "w", encoding="utf-8") as f:
             for fn in funcs:
                 f.write(str(fn.getEntryPoint()) + " -> " + str(fn.getName()) + "\n")
                 count += 1
@@ -58,7 +62,7 @@ def main():
         symbol_table = currentProgram.getSymbolTable()
         symbols = symbol_table.getAllSymbols(True)
         count = 0
-        with open(out_dir + "/objc_classes.txt", "w") as f:
+        with codecs.open(out_dir + "/objc_classes.txt", "w", encoding="utf-8") as f:
             for sym in symbols:
                 name = sym.getName()
                 if name.startswith("-[") or name.startswith("+[") or "OBJC_CLASS_$" in name:
@@ -72,7 +76,7 @@ def main():
         ref_manager = currentProgram.getReferenceManager()
         funcs = currentProgram.getFunctionManager().getFunctions(True)
         count = 0
-        with open(out_dir + "/function_xrefs.txt", "w") as f:
+        with codecs.open(out_dir + "/function_xrefs.txt", "w", encoding="utf-8") as f:
             for fn in funcs:
                 entry = fn.getEntryPoint()
                 refs = ref_manager.getReferencesTo(entry)
@@ -87,7 +91,7 @@ def main():
         print("[+] 'dump_imports_exports' aktif: Dis ve ic semboller taranıyor...")
         external_locs = currentProgram.getExternalManager().getExternalLocations()
         count = 0
-        with open(out_dir + "/imports_exports.txt", "w") as f:
+        with codecs.open(out_dir + "/imports_exports.txt", "w", encoding="utf-8") as f:
             for ext in external_locs:
                 f.write("Import/Export: " + str(ext.getLabel()) + " -> " + str(ext.getAddress()) + "\n")
                 count += 1
@@ -100,7 +104,7 @@ def main():
         ref_manager = currentProgram.getReferenceManager()
         data_iter = listing.getData(True)
         count = 0
-        with open(out_dir + "/string_references.txt", "w") as f:
+        with codecs.open(out_dir + "/string_references.txt", "w", encoding="utf-8") as f:
             while data_iter.hasNext():
                 data = data_iter.next()
                 if "string" in data.getDataType().getName().lower():
@@ -109,8 +113,11 @@ def main():
                         addr = data.getMinAddress()
                         refs = ref_manager.getReferencesTo(addr)
                         for r in refs:
-                            f.write("String '" + str(val) + "' (" + str(addr) + ") -> Cagiran adres: " + str(r.getFromAddress()) + "\n")
-                            count += 1
+                            try:
+                                f.write("String '" + unicode(val) + "' (" + str(addr) + ") -> Cagiran adres: " + str(r.getFromAddress()) + "\n")
+                                count += 1
+                            except:
+                                pass
         print("[+] " + str(count) + " adet string referansi eslestirildi.")
 
     # 7. Segment ve Section Listeleme
@@ -118,7 +125,7 @@ def main():
         print("[+] 'dump_segments' aktif: Segmentler listeleniyor...")
         blocks = currentProgram.getMemory().getBlocks()
         count = 0
-        with open(out_dir + "/segments.txt", "w") as f:
+        with codecs.open(out_dir + "/segments.txt", "w", encoding="utf-8") as f:
             for b in blocks:
                 f.write("Segment: " + str(b.getName()) + " | Start: " + str(b.getStart()) + " | End: " + str(b.getEnd()) + "\n")
                 count += 1
