@@ -41,7 +41,21 @@ jobs:
     - name: LLVM-Objdump ile Disassemble Et
       run: |
         echo "=== DISASSEMBLY (TEXT SEGMENT) ===" > build/output/disassemble.txt
-        llvm-objdump -d superbear.dylib >> build/output/disassemble.txt
+        
+        # Xcode developer path'ini aktif et ve objdump/llvm-objdump yolunu bul
+        DEVELOPER_DIR=$(xcode-select -print-path)
+        
+        # macOS runner üzerindeki olası konumlardan llvm-objdump'ı çalıştır
+        if command -v llvm-objdump &> /dev/null; then
+            llvm-objdump -d superbear.dylib >> build/output/disassemble.txt
+        elif [ -f "$DEVELOPER_DIR/Toolchains/XcodeDefault.xcodechain/usr/bin/llvm-objdump" ]; then
+            "$DEVELOPER_DIR/Toolchains/XcodeDefault.xcodechain/usr/bin/llvm-objdump" -d superbear.dylib >> build/output/disassemble.txt
+        else
+            # Alternatif olarak otool -tv kullanabiliriz (objdump alternatifi olarak)
+            echo "llvm-objdump bulunamadı, otool -tv kullanılıyor..."
+            otool -tv superbear.dylib >> build/output/disassemble.txt
+        fi
+
 
     - name: Sonuçları Artifact Olarak Kaydet
       uses: actions/upload-artifact@v4
