@@ -32,8 +32,7 @@ jobs:
     - name: Run Ghidra Headless Analysis
       run: |
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
-          -import ./superbear.dylib \
-          -analyze
+          -import ./superbear.dylib
 
       
     - name: Sonuçları Kaydet (Artifact)
