@@ -5,11 +5,13 @@
 
 dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir
 dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder
-dump_objc_classes = True      # Tum Objective-C sinif adlarini ve metotlarini kaydeder
+dump_objc_classes = False     # Tum Objective-C sinif adlarini ve metotlarini kaydeder
 dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler
 dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder
 find_string_references = True # Stringlerin kod ici baglantilarini eslestirir
 dump_segments = True          # Segment ve section adres araliklarini listeler
+
+############################################################################################
 
 import sys
 import os
