@@ -1,64 +1,45 @@
-name: SuperBear Dylib Analysis
+name: Ghidra Automated Analysis
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # GitHub Actions sekmesinden manuel başlatmak için
+  workflow_dispatch:
 
 jobs:
-  analyze:
-    runs-on: macos-latest 
+  ghidra-scan:
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Repo'yu Kopyala (Checkout)
+    - name: Repoyu Kopyala (Checkout)
       uses: actions/checkout@v4
 
-    - name: Analiz Klasörü Oluştur
-      run: mkdir -p build/output
+    - name: Java Kurulumu (JDK 17)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-    - name: Dosya Bilgilerini Kontrol Et
+    - name: Ghidra İndir ve Ayıkla
       run: |
-        echo "=== DOSYA BİLGİSİ ==="
-        ls -lh superbear.dylib
-        file superbear.dylib
+        GHIDRA_VERSION="11.2.1_PUBLIC"
+        GHIDRA_DATE="20241105"
+        wget https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_${GHIDRA_DATE}.zip
+        unzip -q ghidra_${GHIDRA_VERSION}_${GHIDRA_DATE}.zip
+        echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}" >> $GITHUB_ENV
 
-    - name: Strings ve Sembolleri Çıkart
+    - name: Headless Analiz Çalıştır
       run: |
-        echo "=== STRINGS DÖKÜMÜ ===" > build/output/strings_result.txt
-        strings superbear.dylib >> build/output/strings_result.txt
-
-        echo "=== DIŞA AKTARILAN SEMBOLLER ===" > build/output/symbols_result.txt
-        nm -gU superbear.dylib >> build/output/symbols_result.txt
-
-    - name: Otool ile Bağımlılıkları ve Load Command'leri İncele
-      run: |
-        echo "=== DYLIB BAĞIMLILIKLARI ===" > build/output/otool_deps.txt
-        otool -L superbear.dylib >> build/output/otool_deps.txt
-
-        echo "=== OTOOL LOAD COMMANDS ===" > build/output/otool_loads.txt
-        otool -l superbear.dylib >> build/output/otool_loads.txt
-
-    - name: LLVM-Objdump ile Disassemble Et
-      run: |
-        echo "=== DISASSEMBLY (TEXT SEGMENT) ===" > build/output/disassemble.txt
+        # Hedef dosyanın repoda 'target/binary' yolunda olduğunu varsayıyoruz
+        # Örnek olarak analiz sonuçlarını /tmp dizinine çıkartıyoruz
+        mkdir -p /tmp/ghidra_out
         
-        # Xcode developer path'ini aktif et ve objdump/llvm-objdump yolunu bul
-        DEVELOPER_DIR=$(xcode-select -print-path)
-        
-        # macOS runner üzerindeki olası konumlardan llvm-objdump'ı çalıştır
-        if command -v llvm-objdump &> /dev/null; then
-            llvm-objdump -d superbear.dylib >> build/output/disassemble.txt
-        elif [ -f "$DEVELOPER_DIR/Toolchains/XcodeDefault.xcodechain/usr/bin/llvm-objdump" ]; then
-            "$DEVELOPER_DIR/Toolchains/XcodeDefault.xcodechain/usr/bin/llvm-objdump" -d superbear.dylib >> build/output/disassemble.txt
-        else
-            # Alternatif olarak otool -tv kullanabiliriz (objdump alternatifi olarak)
-            echo "llvm-objdump bulunamadı, otool -tv kullanılıyor..."
-            otool -tv superbear.dylib >> build/output/disassemble.txt
-        fi
-
-
-    - name: Sonuçları Artifact Olarak Kaydet
+        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_project TempAnalysisProject \
+          -import ./target/superbear.dylib \
+          -analyze \
+          -output /tmp/ghidra_out
+      
+    - name: Sonuçları Kaydet (Artifact)
       uses: actions/upload-artifact@v4
       with:
-        name: superbear-analysis-results
-        path: build/output/
+        name: ghidra-analysis-report
+        path: /tmp/ghidra_out/
