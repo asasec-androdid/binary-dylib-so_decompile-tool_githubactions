@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-# Ghidra Modüler API Yönetici Betiği
-# İstediğin özelliğin başındaki '#' işaretini kaldırarak aktif edebilirsin.
+# Ghidra Moduler API Yonetici Betigi
+# Aktif etmek istedigin ozelligin basindaki '#' isaretini kaldirabilirsin.
 
-# hızlı_dump //Bu özellik hızlı modda sadece temel verileri işler
-# disable_objc_messages //En çok zaman alan 'Objective-C Decompiler Message' analizini kapatır
-dump_all_strings //binary içerisindeki tüm stringleri dışarı aktarır
-dump_functions //binary içerisindeki tüm fonksiyon adlarını ve başlangıç adreslerini kaydeder
-dump_objc_classes //Tüm Objective-C sınıf adlarını ve metotlarını kaydeder
-dump_xrefs //Kritik fonksiyonların çapraz referanslarını (Xref) listeler
-dump_imports_exports //Dışa aktarılan (export) ve dışarıdan alınan (import) sembolleri kaydeder
-find_string_references //Stringlerin hangi adreslerde/fonksiyonlarda geçtiğini eşleştirir
-dump_segments //segment ve section adres aralıklarını listeler
+# hizli_dump //Bu ozellik hizli modda sadece temel verileri isler
+dump_all_strings //binary icerisindeki tum stringleri disari aktarir
+dump_functions //binary icerisindeki tum fonksiyon adlarini ve baslangic adreslerini kaydeder
+dump_objc_classes //Tum Objective-C sinif adlarini ve metotlarini kaydeder
+dump_xrefs //Kritik fonksiyonlarin çapraz referanslarini listeler
+dump_imports_exports //Disa aktarilan ve disaridan alinan sembolleri kaydeder
+find_string_references //Stringlerin hangi adreslerde gectigini eslestirir
+dump_segments //segment ve section adres araliklarini listeler
 
 import sys
 from ghidra.program.model.listing import CodeUnit
