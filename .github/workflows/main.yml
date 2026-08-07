@@ -28,16 +28,14 @@ jobs:
         echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}_PUBLIC" >> $GITHUB_ENV
 
 
-    - name: Headless Analiz Çalıştır
+
+    - name: Run Ghidra Headless Analysis
       run: |
-        # Hedef dosyanın repoda 'target/binary' yolunda olduğunu varsayıyoruz
-        # Örnek olarak analiz sonuçlarını /tmp dizinine çıkartıyoruz
-        mkdir -p /tmp/ghidra_out
-        
-        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_project TempAnalysisProject \
-          -import ./superbear.dylib \
-          -analyze \
-          -output /tmp/ghidra_out
+        # Doğru parametre sırası: Proje Dizini, Proje Adı, -import, Hedef Dosya
+        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
+          -import ./target/binary \
+          -postScript ExportStrings.py /tmp/output_strings.txt
+
       
     - name: Sonuçları Kaydet (Artifact)
       uses: actions/upload-artifact@v4
