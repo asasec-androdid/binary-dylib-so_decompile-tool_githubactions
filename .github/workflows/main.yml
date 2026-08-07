@@ -35,7 +35,12 @@ jobs:
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
           -import ./superbear.dylib
 
-      
+     - name: Zip and Prepare Artifact
+      run: |
+        mkdir -p /tmp/ghidra_out
+        zip -r /tmp/ghidra_out/ghidra_project.zip /tmp/ghidra_proj
+
+    
     - name: Sonuçları Kaydet (Artifact)
       uses: actions/upload-artifact@v4
       with:
