@@ -31,10 +31,9 @@ jobs:
 
     - name: Run Ghidra Headless Analysis
       run: |
-        # Doğru parametre sırası: Proje Dizini, Proje Adı, -import, Hedef Dosya
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
           -import ./superbear.dylib \
-          -postScript ExportStrings.py /tmp/output_strings.txt
+          -analyze
 
       
     - name: Sonuçları Kaydet (Artifact)
