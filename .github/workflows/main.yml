@@ -27,20 +27,17 @@ jobs:
         unzip -q ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip
         echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}_PUBLIC" >> $GITHUB_ENV
 
-
-
     - name: Run Ghidra Headless Analysis
       run: |
         mkdir -p /tmp/ghidra_proj
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
           -import ./superbear.dylib
 
-     - name: Zip and Prepare Artifact
+    - name: Zip and Prepare Artifact
       run: |
         mkdir -p /tmp/ghidra_out
         zip -r /tmp/ghidra_out/ghidra_project.zip /tmp/ghidra_proj
 
-    
     - name: Sonuçları Kaydet (Artifact)
       uses: actions/upload-artifact@v4
       with:
