@@ -31,7 +31,8 @@ jobs:
       run: |
         mkdir -p /tmp/ghidra_proj
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject \
-          -import ./superbear.dylib
+          -import ./superbear.dylib \
+          -postScript ./scripts/asasec-ghidra.py
 
     - name: Zip and Prepare Artifact
       run: |
