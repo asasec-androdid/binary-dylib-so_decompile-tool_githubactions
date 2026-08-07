@@ -19,13 +19,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Ghidra İndir ve Ayıkla
+    - name: Download and Setup Ghidra
       run: |
-        GHIDRA_VERSION="11.2.1_PUBLIC"
+        GHIDRA_VERSION="11.2.1"
         GHIDRA_DATE="20241105"
-        wget https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_${GHIDRA_DATE}.zip
-        unzip -q ghidra_${GHIDRA_VERSION}_${GHIDRA_DATE}.zip
-        echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}" >> $GITHUB_ENV
+        wget https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip
+        unzip -q ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip
+        echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}_PUBLIC" >> $GITHUB_ENV
+
 
     - name: Headless Analiz Çalıştır
       run: |
