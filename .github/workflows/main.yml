@@ -29,8 +29,10 @@ jobs:
 
     - name: Run Ghidra Headless Analysis
       run: |
+        mv ./Dumpfile/bilgi.txt /tmp/bilgi_temp.txt
         mkdir -p /tmp/ghidra_proj
-        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject -import ./Dumpfile/*.asasec -noanalysis -postScript ./scripts/asasec-ghidra.py
+        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject -import ./Dumpfile -noanalysis -postScript ./scripts/asasec-ghidra.py
+        mv /tmp/bilgi_temp.txt ./Dumpfile/bilgi.txt
 
     - name: Zip and Prepare Artifact
       run: |
