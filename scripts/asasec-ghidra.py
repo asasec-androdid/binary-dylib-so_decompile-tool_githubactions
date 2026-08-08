@@ -13,7 +13,7 @@ dump_segments = True          # Segment ve section adres araliklarini listeler[s
 dump_globals = True           # Global degiskenleri ve veri adreslerini kaydeder
 dump_custom_filters = True    # Kritik anahtar kelimeleri iceren fonksiyonlari filtreler
 dump_vtables = True           # Sanal fonksiyon tablolarini (VTable) listeler
-dump_data_references = True   # Veri segmentlerine yapilan atiflari (Data Xrefs) listeler
+dump_data_references = False   # Veri segmentlerine yapilan atiflari (Data Xrefs) listeler
 dump_imported_libraries = True # Oyunun disaridan cagirdigi paylasimli kutuphaneleri (Framework/dylib) listeler
 
 ############################################################################################
@@ -215,6 +215,7 @@ def main():
             except Exception as e:
                 f.write("Dis kutuphaneler okunurken hata olustu: " + str(e) + "\n")
         print("[+] " + str(count) + " dis kutuphane kaydedildi.")
+        print("[+] " +  "Tüm dumplama başarılı zipleme işlemi başliyor.")
 
 if __name__ == "__main__":
     main()
