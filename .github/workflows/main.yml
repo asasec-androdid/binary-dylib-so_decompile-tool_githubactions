@@ -27,12 +27,34 @@ jobs:
         unzip -q ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip
         echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}_PUBLIC" >> $GITHUB_ENV
 
+    - name: URL Kontrol Et ve Büyük Dosyayı İndir
+      run: |
+        
+        if [ -s Dumpfile/bigfile_url.txt ]; then
+          echo "bigfile_url.txt dolu, dosya indiriliyor..."
+          DOWNLOAD_URL=$(cat Dumpfile/bigfile_url.txt | tr -d '\r')
+          
+          # URL'den dosya adını otomatik çek (örn: dosya.dylib veya oyun)
+          FILENAME=$(basename "$DOWNLOAD_URL" | cut -d? -f1)
+          if [ -z "$FILENAME" ]; then
+            FILENAME="OyunBinary"
+          fi
+          
+          echo "İndirilen dosya adı: $FILENAME"
+          wget -O "./Dumpfile/$FILENAME" "$DOWNLOAD_URL"
+        else
+          echo "bigfile_url.txt boş, indirme işlemi atlanıyor."
+        fi
+
+    
     - name: Run Ghidra Headless Analysis
       run: |
         mv ./Dumpfile/bilgi.txt /tmp/bilgi_temp.txt
+        mv ./Dumpfile/bigfile_url.txt /tmp/bigfile_url_temp.txt
         mkdir -p /tmp/ghidra_proj
         $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject -import ./Dumpfile -noanalysis -postScript ./scripts/asasec-ghidra.py
         mv /tmp/bilgi_temp.txt ./Dumpfile/bilgi.txt
+        mv /tmp/bigfile_url_temp.txt ./Dumpfile/bigfile_url.txt
 
     - name: Zip and Prepare Artifact
       run: |
