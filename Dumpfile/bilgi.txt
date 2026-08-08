@@ -1,0 +1,1 @@
+Lütfen dump yapacağınız dosyanın sonu .asasec ile bitsin.
