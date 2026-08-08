@@ -201,19 +201,20 @@ def main():
                             pass
         print("[+] " + str(count) + " veri referansi kaydedildi.")
 
-    # 12. Yeni Modul: Disaridan Bagimli Kutuphaneler (External Libraries)
+   # 12. Yeni Modul: Disaridan Bagimli Kutuphaneler (External Libraries) - Duzeltilmis Versiyon
     if dump_imported_libraries:
         print("[+] 'dump_imported_libraries' aktif: Dis kutuphaneler taraniyor...")
-        ext_loc_mgr = currentProgram.getExternalLocationManager()
-        ext_libraries = ext_loc_mgr.getExternalLibraryNames()
         count = 0
         with codecs.open(out_dir + "/imported_libraries.txt", "w", encoding="utf-8") as f:
-            for lib in ext_libraries:
-                f.write("Dis Kutuphane / Framework: " + str(lib) + "\n")
-                count += 1
+            try:
+                external_mgr = currentProgram.getExternalManager()
+                ext_libraries = external_mgr.getExternalLibraryNames()
+                for lib in ext_libraries:
+                    f.write("Dis Kutuphane / Framework: " + str(lib) + "\n")
+                    count += 1
+            except Exception as e:
+                f.write("Dis kutuphaneler okunurken hata olustu: " + str(e) + "\n")
         print("[+] " + str(count) + " dis kutuphane kaydedildi.")
-
-    print("[*] Tum secilen moduller basariyla tamamlandi!")
 
 if __name__ == "__main__":
     main()
