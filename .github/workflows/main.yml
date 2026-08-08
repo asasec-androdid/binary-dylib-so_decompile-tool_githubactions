@@ -31,13 +31,12 @@ jobs:
       run: |
         
         if [ -s Dumpfile/bigfile_url.txt ]; then
-          # Dosyadaki boşlukları ve satır sonlarını temizleyerek oku
-          URL_VAL=$(grep '^url=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | xargs)
-          NAME_VAL=$(grep '^ad=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | xargs)
+          # url= ve ad= değerlerini çekip tırnak işaretlerini, boşlukları ve satır sonlarını temizle
+          URL_VAL=$(grep '^url=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | tr -d '"' | tr -d "'" | xargs)
+          NAME_VAL=$(grep '^ad=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | tr -d '"' | tr -d "'" | xargs)
           
-          # Eğer URL boş değilse ve "default" değilse işlemi gerçekleştir
-          if [ -n "$URL_VAL" ] && [ "$URL_VAL" != "default" ]; then
-            # Eğer 'ad' alanı boş bırakıldıysa URL'den otomatik isim türet
+          # URL boşsa, "default" ise veya "DEFAULT" ise indirmeyi atla
+          if [ -n "$URL_VAL" ] && [ "$URL_VAL" != "default" ] && [ "$URL_VAL" != "DEFAULT" ]; then
             if [ -z "$NAME_VAL" ]; then
               NAME_VAL=$(basename "$URL_VAL" | cut -d? -f1)
               if [ -z "$NAME_VAL" ]; then
@@ -48,8 +47,9 @@ jobs:
             echo "Dosya indiriliyor: $NAME_VAL"
             wget -O "./Dumpfile/$NAME_VAL" "$URL_VAL"
             file "./Dumpfile/$NAME_VAL"
+            sleep 4
           else
-            echo "Geçerli bir URL bulunamadı, indirme atlanıyor."
+            echo "bigfile_url.txt 'default' veya boş olarak ayarlanmış, indirme işlemi atlanıyor."
           fi
         else
           echo "bigfile_url.txt boş, indirme işlemi atlanıyor."
