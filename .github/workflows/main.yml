@@ -30,7 +30,7 @@ jobs:
     - name: Run Ghidra Headless Analysis
       run: |
         mkdir -p /tmp/ghidra_proj
-        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject -import ./superbear.dylib -noanalysis -postScript ./scripts/asasec-ghidra.py
+        $GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra_proj TempProject -import ./Dumpfile -noanalysis -postScript ./scripts/asasec-ghidra.py
 
     - name: Zip and Prepare Artifact
       run: |
