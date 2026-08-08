@@ -1,1 +1,6 @@
-Lütfen dump yapacağınız dosyanın sonu .asasec ile bitsin.
+Lütfen dump yapacağınız dosyayı buraya ekleyin.
+
+Desteklenen Dosyalar:
+- *.dylib
+- Gamebinary
+- .so (coming soon(yakında gelecek))
