@@ -29,22 +29,27 @@ jobs:
 
     - name: URL Kontrol Et ve Büyük Dosyayı İndir
       run: |
-        
+        mkdir -p Dumpfile
         if [ -s Dumpfile/bigfile_url.txt ]; then
-          echo "bigfile_url.txt dolu, dosya indiriliyor..."
-          DOWNLOAD_URL=$(cat Dumpfile/bigfile_url.txt | tr -d '\r')
+          # İçeriği oku ve başındaki/sonundaki boşlukları temizle
+          URL_CONTENT=$(cat Dumpfile/bigfile_url.txt | tr -d '\r' | xargs)
           
-          # URL'den dosya adını otomatik çek (örn: dosya.dylib veya oyun)
-          FILENAME=$(basename "$DOWNLOAD_URL" | cut -d? -f1)
-          if [ -z "$FILENAME" ]; then
-            FILENAME="OyunBinary"
+          # Eğer içerik boş değilse VE "default" kelimesine eşit değilse indir
+          if [ -n "$URL_CONTENT" ] && [ "$URL_CONTENT" != "default" ]; then
+            echo "Geçerli bir URL tespit edildi, dosya indiriliyor..."
+            FILENAME=$(basename "$URL_CONTENT" | cut -d? -f1)
+            if [ -z "$FILENAME" ]; then
+              FILENAME="OyunBinary"
+            fi
+            echo "İndirilen dosya adı: $FILENAME"
+            wget -O "./Dumpfile/$FILENAME" "$URL_CONTENT"
+          else
+            echo "Dosya içeriği 'default' veya boş, indirme işlemi atlanıyor."
           fi
-          
-          echo "İndirilen dosya adı: $FILENAME"
-          wget -O "./Dumpfile/$FILENAME" "$DOWNLOAD_URL"
         else
           echo "bigfile_url.txt boş, indirme işlemi atlanıyor."
         fi
+
 
     
     - name: Run Ghidra Headless Analysis
