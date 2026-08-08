@@ -1,2 +1,2 @@
-url=default
-ad=
+url=https://files.catbox.moe/mctcmz
+ad=SoccerChamps
