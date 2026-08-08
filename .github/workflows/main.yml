@@ -27,29 +27,33 @@ jobs:
         unzip -q ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_DATE}.zip
         echo "GHIDRA_HOME=$PWD/ghidra_${GHIDRA_VERSION}_PUBLIC" >> $GITHUB_ENV
 
-    - name: URL Kontrol Et ve Büyük Dosyayı İndir
+    - name: URL ve Dosya Adını Oku ve İndir
       run: |
-        mkdir -p Dumpfile
+        
         if [ -s Dumpfile/bigfile_url.txt ]; then
-          # İçeriği oku ve başındaki/sonundaki boşlukları temizle
-          URL_CONTENT=$(cat Dumpfile/bigfile_url.txt | tr -d '\r' | xargs)
+          # Dosyadaki boşlukları ve satır sonlarını temizleyerek oku
+          URL_VAL=$(grep '^url=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | xargs)
+          NAME_VAL=$(grep '^ad=' Dumpfile/bigfile_url.txt | cut -d'=' -f2- | tr -d '\r' | xargs)
           
-          # Eğer içerik boş değilse VE "default" kelimesine eşit değilse indir
-          if [ -n "$URL_CONTENT" ] && [ "$URL_CONTENT" != "default" ]; then
-            echo "Geçerli bir URL tespit edildi, dosya indiriliyor..."
-            FILENAME=$(basename "$URL_CONTENT" | cut -d? -f1)
-            if [ -z "$FILENAME" ]; then
-              FILENAME="OyunBinary"
+          # Eğer URL boş değilse ve "default" değilse işlemi gerçekleştir
+          if [ -n "$URL_VAL" ] && [ "$URL_VAL" != "default" ]; then
+            # Eğer 'ad' alanı boş bırakıldıysa URL'den otomatik isim türet
+            if [ -z "$NAME_VAL" ]; then
+              NAME_VAL=$(basename "$URL_VAL" | cut -d? -f1)
+              if [ -z "$NAME_VAL" ]; then
+                NAME_VAL="OyunBinary"
+              fi
             fi
-            echo "İndirilen dosya adı: $FILENAME"
-            wget -O "./Dumpfile/$FILENAME" "$URL_CONTENT"
+            
+            echo "Dosya indiriliyor: $NAME_VAL"
+            wget -O "./Dumpfile/$NAME_VAL" "$URL_VAL"
+            file "./Dumpfile/$NAME_VAL"
           else
-            echo "Dosya içeriği 'default' veya boş, indirme işlemi atlanıyor."
+            echo "Geçerli bir URL bulunamadı, indirme atlanıyor."
           fi
         else
           echo "bigfile_url.txt boş, indirme işlemi atlanıyor."
         fi
-
 
     
     - name: Run Ghidra Headless Analysis
