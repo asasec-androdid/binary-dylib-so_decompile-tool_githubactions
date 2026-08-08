@@ -3,13 +3,18 @@
 # Ghidra Moduler API Yonetici Betigi
 # Aktif etmek istedigin ozelligin onune True yaz. Kapatmak icin False yaz.
 
-dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir[span_1](start_span)[span_1](end_span)
-dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder[span_2](start_span)[span_2](end_span)
-dump_objc_classes = True     # Tum Objective-C sinif adlarini ve metotlarini kaydeder[span_3](start_span)[span_3](end_span)
-dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler[span_4](start_span)[span_4](end_span)
-dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder[span_5](start_span)[span_5](end_span)
-find_string_references = True # Stringlerin kod ici baglantilarini eslestirir[span_6](start_span)[span_6](end_span)
-dump_segments = True          # Segment ve section adres araliklarini listeler[span_7](start_span)[span_7](end_span)
+dump_all_strings = True       # Binary icerisindeki tum stringleri disari aktarir[span_0](start_span)[span_0](end_span)
+dump_functions = True         # Tum fonksiyon adlarini ve baslangic adreslerini kaydeder[span_1](start_span)[span_1](end_span)
+dump_objc_classes = True     # Tum Objective-C sinif adlarini ve metotlarini kaydeder[span_2](start_span)[span_2](end_span)
+dump_xrefs = True             # Kritik fonksiyonlarin capraz referanslarini listeler[span_3](start_span)[span_3](end_span)
+dump_imports_exports = True   # Disa aktarilan ve disaridan alinan sembolleri kaydeder[span_4](start_span)[span_4](end_span)
+find_string_references = True # Stringlerin kod ici baglantilarini eslestirir[span_5](start_span)[span_5](end_span)
+dump_segments = True          # Segment ve section adres araliklarini listeler[span_6](start_span)[span_6](end_span)
+dump_globals = True           # Global degiskenleri ve veri adreslerini kaydeder
+dump_custom_filters = True    # Kritik anahtar kelimeleri iceren fonksiyonlari filtreler
+dump_vtables = True           # Sanal fonksiyon tablolarini (VTable) listeler
+dump_data_references = True   # Veri segmentlerine yapilan atiflari (Data Xrefs) listeler
+dump_imported_libraries = True # Oyunun disaridan cagirdigi paylasimli kutuphaneleri (Framework/dylib) listeler
 
 ############################################################################################
 
@@ -86,7 +91,7 @@ def main():
                     count += 1
         print("[+] " + str(count) + " fonksiyonun referanslari kaydedildi.")
 
-    # 5. Import / Export Sembolleri (Duzeltilmis Versiyon)
+    # 5. Import / Export Sembolleri
     if dump_imports_exports:
         print("[+] 'dump_imports_exports' aktif: Dis ve ic semboller taranıyor...")
         symbol_table = currentProgram.getSymbolTable()
@@ -133,6 +138,80 @@ def main():
                 f.write("Segment: " + str(b.getName()) + " | Start: " + str(b.getStart()) + " | End: " + str(b.getEnd()) + "\n")
                 count += 1
         print("[+] " + str(count) + " segment kaydedildi.")
+
+    # 8. Global Degiskenler ve Veri Adresleri
+    if dump_globals:
+        print("[+] 'dump_globals' aktif: Veri segmentleri ve global degiskenler taranıyor...")
+        symbol_table = currentProgram.getSymbolTable()
+        symbols = symbol_table.getAllSymbols(True)
+        count = 0
+        with codecs.open(out_dir + "/globals.txt", "w", encoding="utf-8") as f:
+            for sym in symbols:
+                if sym.getSymbolType().toString() in ["Label", "Global"]:
+                    f.write(str(sym.getAddress()) + " -> " + str(sym.getName()) + "\n")
+                    count += 1
+        print("[+] " + str(count) + " global degisken kaydedildi.")
+
+    # 9. Kritik Anahtar Kelime Filtreleme (Hile odakli)
+    if dump_custom_filters:
+        print("[+] 'dump_custom_filters' aktif: Oyun ici kritik fonksiyonlar filtreleniyor...")
+        keywords = ["player", "score", "coin", "money", "health", "speed", "damage", "item", "buy"]
+        funcs = currentProgram.getFunctionManager().getFunctions(True)
+        count = 0
+        with codecs.open(out_dir + "/filtered_game_functions.txt", "w", encoding="utf-8") as f:
+            for fn in funcs:
+                fname = fn.getName().lower()
+                if any(kw in fname for kw in keywords):
+                    f.write(str(fn.getEntryPoint()) + " -> " + str(fn.getName()) + "\n")
+                    count += 1
+        print("[+] " + str(count) + " hedef fonksiyon filtrelendi ve kaydedildi.")
+
+    # 10. VTable (Virtual Table) Taramasi
+    if dump_vtables:
+        print("[+] 'dump_vtables' aktif: VTable yapilari taraniyor...")
+        symbol_table = currentProgram.getSymbolTable()
+        symbols = symbol_table.getAllSymbols(True)
+        count = 0
+        with codecs.open(out_dir + "/vtables.txt", "w", encoding="utf-8") as f:
+            for sym in symbols:
+                name = sym.getName()
+                if "vftable" in name.lower() or "vtable" in name.lower():
+                    f.write(str(sym.getAddress()) + " -> " + str(name) + "\n")
+                    count += 1
+        print("[+] " + str(count) + " VTable adresi kaydedildi.")
+
+    # 11. Yeni Modul: Veri Segmenti Referanslari (Data Xrefs)
+    if dump_data_references:
+        print("[+] 'dump_data_references' aktif: Veri referanslari taraniyor...")
+        listing = currentProgram.getListing()
+        ref_manager = currentProgram.getReferenceManager()
+        data_iter = listing.getData(True)
+        count = 0
+        with codecs.open(out_dir + "/data_references.txt", "w", encoding="utf-8") as f:
+            while data_iter.hasNext():
+                data = data_iter.next()
+                addr = data.getMinAddress()
+                refs = ref_manager.getReferencesTo(addr)
+                for r in refs:
+                    if r.getReferenceType().isData():
+                        try:
+                            f.write("Veri Adresi " + str(addr) + " -> Kullanan Kod Adresi: " + str(r.getFromAddress()) + "\n")
+                            count += 1
+                        except:
+                            pass
+        print("[+] " + str(count) + " veri referansi kaydedildi.")
+
+    # 12. Yeni Modul: Disaridan Bagimli Kutuphaneler (External Libraries)
+    if dump_imported_libraries:
+        print("[+] 'dump_imported_libraries' aktif: Dis kutuphaneler taraniyor...")
+        ext_loc_mgr = currentProgram.getExternalLocationManager()
+        ext_libraries = ext_loc_mgr.getExternalLibraryNames()
+        count = 0
+        with codecs.open(out_dir + "/imported_libraries.txt", "w", encoding="utf-8") as f:
+            for lib in ext_libraries:
+                f.write("Dis Kutuphane / Framework: " + str(lib) + "\n")
+                count += 1
+        print("[+] " + str(count) + " dis kutuphane kaydedildi.")
 
     print("[*] Tum secilen moduller basariyla tamamlandi!")
 
